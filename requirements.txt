@@ -1,0 +1,6 @@
+#commands that use the terminal to read this file and automatically search and install the required files for the environment without needing to manually type it all out individually
+# read : pip install -r .\requirements.txt
+discord.py
+python-dotenv
+colorama
+requests

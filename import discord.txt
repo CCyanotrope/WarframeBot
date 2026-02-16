@@ -1,0 +1,141 @@
+import discord
+from discord import app_commands
+from discord.ext import commands
+from main import getRequest, GUILD_ID
+import main
+from colorama import Fore
+
+import datetime
+import time
+
+class ArcaneData:
+    def __init__(self):
+        self.name = "name"
+        self.rarity = "rarity"
+        self.type = "type"
+        self.drops = []
+        self.levelStats = []
+        self.img = "image"
+
+arcanes_api = "https://raw.githubusercontent.com/WFCD/warframe-items/refs/heads/master/data/json/Arcanes.json"
+
+arcaneFile = getRequest(arcanes_api)
+
+choice = app_commands.Choice
+
+typeList : list[app_commands.Choice] = [choice(name="Warframe Arcane",value="Warframe Arcane"),
+                                        choice(name="Primary Arcane",value="Primary Arcane"),
+                                        choice(name="Secondary Arcane",value="Secondary Arcane"),
+                                        choice(name="Melee Arcane", value="Melee Arcane")]
+
+def populateArcaneList(arcaneType : str):
+    ArcaneDataArray : list[ArcaneData] = [] #holds a list of ArcaneDatas objects
+    for arcane in arcaneFile: #arcaneFile streamed directly from JSON file
+        dupeArc = False
+        if(arcane["type"] == arcaneType): #check if the arcane is from a warframe
+            for item in ArcaneDataArray: #for each arcane in the array
+                if(arcane["name"] == item.name or (bool(arcane.get("levelStats")) == False or bool((arcane.get("rarity")) == False))): #if the current arcane in the wider loop matches even one value in the arcane array...
+                    dupeArc = True #it determines if it is a duplicate!
+                    break
+            if(dupeArc==False):
+                temp=ArcaneData()
+                temp.name = arcane["name"]
+                temp.img = arcane["imageName"]
+                temp.type = arcane["type"]
+                for stats in arcane["levelStats"]:
+                    temp.levelStats.append(str(stats["stats"]))
+                    # print(f"{temp.name} + {index}")
+                    # print(temp.levelStats[0])
+                    # print(str(requestedArcane.levelStats[0]["stats"]))
+
+                for dropLocations in arcane["drops"]:
+                    # print(dropLocations)
+                    temp.drops.append(dropLocations)
+                    # print(temp.drops)
+                if(bool(arcane.get("rarity")) == False):
+                    temp.rarity = "Common"
+                else:
+                    temp.rarity = arcane["rarity"]
+                # print(temp.drops)
+                ArcaneDataArray.append(temp)
+                
+    return ArcaneDataArray
+
+
+def grabArcaneData(name : str, arcaneArray : list[ArcaneData] = []):
+    fullArcane = ArcaneData()
+    tempName = name.replace(" ", "")
+    for data in arcaneArray:
+        tempDataName = data.name.replace(" ", "")
+        if(tempName.casefold() == tempDataName.casefold()):
+            #print(Fore.LIGHTMAGENTA_EX + tempDataName)
+            fullArcane.name = data.name
+            fullArcane.rarity = data.rarity
+            fullArcane.levelStats = data.levelStats
+            fullArcane.drops = data.drops
+            fullArcane.img = data.img
+            fullArcane.type = data.type
+            return fullArcane
+    return None
+
+
+
+class ArcaneCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(Fore.GREEN+f"Arcane file loaded.")
+    
+
+    # @commands.command()
+    # async def pingSelf(self, ctx):
+    #     await ctx.send(f"Hello {ctx.author.mention}! This is using a cog file.") #ctx.send sends back the message from where the location/channel took place
+    
+    @app_commands.command(name="arcanesearch", description="COG VER: Grabs Arcane Data using the name of the Arcane.", guild=GUILD_ID)
+    @app_commands.choices(arcanetype=typeList)
+    async def warframearcane(i:discord.Interaction, arcanetype:app_commands.Choice[str], arcanename:str):
+        arcaneList = populateArcaneList(arcanetype.value)
+        requestedArcane = grabArcaneData(arcanename, arcaneList)
+        try:
+            # print(type(requestedArcane.levelStats[0]))
+            print(requestedArcane.drops[0]["location"])
+        except:
+            print("Invalid Arcane!")
+
+        if(requestedArcane!=None):
+            arcaneImg = ("https://raw.githubusercontent.com/WFCD/warframe-items/refs/heads/master/data/img/"+requestedArcane.img)
+     
+            match requestedArcane.rarity:
+                case "Common":
+                    embedColour = discord.Color.from_rgb(160, 82, 45)
+                case "Uncommon":
+                    embedColour = discord.Color.from_rgb(192, 192, 192)
+                case "Rare":
+                    embedColour = discord.Color.from_rgb(212,175,55)
+                case "Legendary":
+                    embedColour = discord.Color.from_rgb(230,252,255)
+            commandEmbed = discord.Embed(title=f"Arcane Search - {requestedArcane.name}", color=embedColour)
+
+            commandEmbed.set_thumbnail(url=arcaneImg)
+            commandEmbed.description = str(f"- **Rank 0**: {requestedArcane.levelStats[0]} \n- **Rank 5**: {requestedArcane.levelStats[5]}")
+            commandEmbed.add_field(name="Rarity", value=requestedArcane.rarity, inline=False)
+            commandEmbed.add_field(name="Arcane Type", value=requestedArcane.type, inline=False)
+
+            for dropLocations in requestedArcane.drops:
+                commandEmbed.add_field(name=f"", value="", inline=False)
+                commandEmbed.add_field(name="Drop Location", value=dropLocations["location"], inline=True)
+                commandEmbed.add_field(name="Chance", value=f"% {round(100*(dropLocations["chance"]), 1)}", inline=True)
+                
+
+            commandEmbed.timestamp = datetime.datetime.now()
+
+            await i.response.send_message(embed=commandEmbed)
+        else:
+            await i.response.send_message("Information was not found! Please try again.")
+
+async def setup(bot):
+    await bot.add_cog(ArcaneCog(bot),guild=GUILD_ID)
+    
+    

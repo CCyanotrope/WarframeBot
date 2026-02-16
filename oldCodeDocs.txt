@@ -1,0 +1,92 @@
+
+# Convert milliseconds to seconds for Python's datetime.fromtimestamp
+date_time = datetime.datetime.fromtimestamp(voidTrader[0]["Activation"]["$date"]["$numberLong"] / 1000)
+print(date_time) # Output: Example: 2014-04-09 11:05:13.715000
+
+
+
+ and (arcane["rarity"] not in arcane or arcane["levelStats"] not in arcane)
+
+ and (arcane["levelStats"] != None)
+
+and (arcane.get("rarity") and arcane.get("levelStats")
+
+
+
+class WarframeArcane:
+    def __init__(self):
+        self.name = "Test Name"
+        self.rarity = "Test Rarity"
+        self.levelStats = "Test Level"
+        self.img = "Test Image"
+
+    testWarframeList = [WarframeArcane] #declare array - whatever is inside of the brackets dictates type
+
+    testWarframeList[0] = WarframeArcane() #passing the base class info to zeroth index to populate values
+    print(testWarframeList[0].name)
+    print(testWarframeList[0].rarity)
+    print(testWarframeList[0].levelStats)
+    print(testWarframeList[0].img)
+    #print test is successful
+
+
+
+#IMPORTANT AS FUCK PLEASE DO NOT LOSE
+@bot.tree.command(name="arcanedata", description="Grabs Arcane Data", guild=GUILD_ID)
+async def arcanedata(i:discord.Interaction):
+    commandEmbed = discord.Embed(title="Arcane Sample Data", color=discord.Color.red())
+    
+    #duplicate of fury does NOT have rarity. first one is the real 1
+    #index 54 of steadfast is the real one - the last one of the 5 -it has the levelStats tag
+    for arcane in arcaneData:
+        dupeArc = False
+        if(arcane["type"] == "Warframe Arcane"): #check if the arcane is from a warframe
+            if(arcane["name"] == "Arcane Steadfast"):
+                print(f"{Fore.RED} {arcane["name"]} : {bool(arcane.get("levelStats"))} - {bool(arcane.get("rarity"))}")
+            for item in arcaneArray: #for each arcane in the array
+
+                if(arcane["name"] == item or (bool(arcane.get("levelStats")) == False or bool((arcane.get("rarity")) == False))): #if the current arcane in the wider loop matches even one value in the arcane array...
+                    print(f"{Fore.CYAN}{arcane["name"]} : {bool(arcane.get("levelStats"))} - {arcane.get("rarity")} - is a duplicate!")
+                    
+
+                    dupeArc = True #it determines if it is a duplicate!
+                    break
+            if(dupeArc==False):
+                #if(arcane["name"] == "Arcane Steadfast"):
+                #print(f"{Fore.GREEN} {arcane["name"]} : {bool(arcane.get("levelStats"))} - {bool(arcane.get("rarity"))}")
+                arcaneArray.append(arcane["name"])
+               
+    
+    for index,thing in enumerate(arcaneArray):
+        print(arcaneArray[index])
+
+    arcaneImg = ("https://raw.githubusercontent.com/WFCD/warframe-items/refs/heads/master/data/img/"+arcaneData[30]["imageName"])
+
+    commandEmbed.set_image(url=arcaneImg)
+    await i.response.send_message(embed=commandEmbed)
+
+@app_commands.choices(arcanetype=[app_commands.Choice(name="Warframe Arcane", value="Warframe Arcane"), 
+                               app_commands.Choice(name="Primary Arcane", value="Primary Arcane")])
+arcanetype: app_commands.Choice[str]
+
+
+
+
+
+
+
+
+@bot.tree.command(name="fruits")
+async def fruits(interaction: discord.Interaction, fruit: str):
+    await interaction.response.send_message(f'Your favourite fruit seems to be {fruit}')
+
+@fruits.autocomplete('fruit')
+async def fruits_autocomplete(
+    interaction: discord.Interaction,
+    current: str,
+) -> list[app_commands.Choice[str]]:
+    fruits = ['Banana', 'Pineapple', 'Apple', 'Watermelon', 'Melon', 'Cherry']
+    return [
+        app_commands.Choice(name=fruit, value=fruit)
+        for fruit in fruits if current.lower() in fruit.lower()
+    ]
