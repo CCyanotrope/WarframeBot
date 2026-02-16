@@ -1,7 +1,7 @@
 # WarframeBot
 
 ## Welcome to Warframe Bot!
-Warframe Bot is a simple Discord Bot made using Python. Please note it is not supposed to be used for any substansial use - as it is a purely educational tool for myself.
+Warframe Bot is a simple Discord Bot made using Python. Please note it is a purely educational tool for myself.
 However, I still believe a small explanation is due in order to give an idea of its scope and capabilities.
 
 ## Arcane Search
