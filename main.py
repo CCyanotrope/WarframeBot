@@ -121,8 +121,8 @@ async def barowhen(i: discord.Interaction):
     
         
    
-    baroImg = discord.File("./image/Baro1.png", filename="baro.png")
-    thumbnailLotus = discord.File("./image/LotusFlower.png", filename="thumbnailLotus.png")
+    baroImg = discord.File("./imageAssets/Baro1.png", filename="baro.png")
+    thumbnailLotus = discord.File("./imageAssets/LotusFlower.png", filename="thumbnailLotus.png")
     #mrFooter = discord.File("./image/HDmrfrog.webp", filename="HDmrfrog.webp")
     #print(thumbnail.filename)
     embedBaro = discord.Embed(title="Where's Baro?", color=discord.Color.blue())
@@ -153,7 +153,7 @@ async def barowhen(i: discord.Interaction):
 
 @bot.tree.command(name="bingbong", description="what does this button do? :0", guild=GUILD_ID)
 async def bingbong(interaction: discord.Interaction):
-    await interaction.response.send_message(f"ITS HIM", file=discord.File("./image/bingbong.jpg", spoiler=True))
+    await interaction.response.send_message(f"ITS HIM", file=discord.File("./imageAssets/bingbong.jpg", spoiler=True))
 
 
 # SYNC MAIN BOT TO ALLOW SLASH COMMANDS TO WORK AT CURRENT STATE
@@ -225,7 +225,7 @@ async def hello(ctx):
 
 """@bot.tree.command(name="bingbong2", description="what does this button do? :0", guild=GUILD_ID)
     async def bingbong2(interaction: discord.Interaction):
-    await interaction.response.send_message(f"ITS NOT HIM", file=discord.File("./image/HDmrfrog.webp", spoiler=True))"""
+    await interaction.response.send_message(f"ITS NOT HIM", file=discord.File("./imageAssets/HDmrfrog.webp", spoiler=True))"""
 
 
 async def main():
